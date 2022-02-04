@@ -18,3 +18,4 @@ resources:
   - deploy-v3-liq.yml
   - deploy-v3-liq-7.yml
   - deploy-v3-liq-8.yml
+  - deploy-v3-liq-9.yml
