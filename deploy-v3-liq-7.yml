@@ -37,10 +37,10 @@ spec:
           resources:
             requests:
               cpu: 1500m
-              memory: 4Gi
+              memory: 16Gi
           env:
             - name: NODE_OPTIONS
-              value: --max_old_space_size=3072
+              value: --max_old_space_size=8192
             - name: CLUSTER
               value: mainnet
             - name: GROUP
