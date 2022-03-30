@@ -60,3 +60,8 @@ spec:
                 secretKeyRef:
                   name: v3-liq
                   key: webhook-url
+            - name: LIQUIDATABLE_FEED_WEBSOCKET_ADDRESS
+              valueFrom:
+                secretKeyRef:
+                  name: v3-liq
+                  key: liquidatable-feed-websocket-address
