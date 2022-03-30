@@ -1220,7 +1220,7 @@ async function closePositions(
             side,
             orderPrice,
             basePositionSize,
-            'ioc',
+            'limit',
             0,
             bookSideInfo ? bookSideInfo : undefined,
             true,
