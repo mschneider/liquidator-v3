@@ -94,7 +94,11 @@ let rootBanks: (RootBank | undefined)[];
 
 async function main() {
   console.log(`Starting liquidator for ${groupName}...`);
-  console.log(`RPC Endpoint: ${rpcEndpoint}`);
+  if (liquidatableFeedWebsocketAddress) {
+    console.log(`Websocket Feed: ${liquidatableFeedWebsocketAddress}`);
+  } else {
+    console.log(`RPC Endpoint: ${rpcEndpoint}`);
+  }
 
   mangoGroup = await client.getMangoGroup(mangoGroupKey);
   cache = await mangoGroup.loadCache(connection);
@@ -352,20 +356,36 @@ async function liquidatableFromLiquidatableFeed() {
   ws.on('open', (x) => console.log("opened liquidatable feed"));
   ws.on('error', (status) => console.log("error on liquidatable feed", status));
   ws.on('close', (err) => console.log("closed liquidatable feed", err));
-  ws.on('candidate', (params) => {
-      const account = params.account;
-      if (!candidatesSet.has(account)) {
-        candidatesSet.add(account);
-        candidates.enqueue(account);
-      }
+  ws.on('candidateStart', (params) => {
+  const account = params.account;
+  if (!candidatesSet.has(account)) {
+      candidatesSet.add(account);
+      candidates.enqueue(account);
+      candidatesSet.add(account);
+    }
   });
 
-  while (true) {
-    const account = await candidates.dequeue();
-    candidatesSet.delete(account);
-    await newAccountOnLiquidatableFeed(account);
+  ws.on('candidate', (params) => {
+    const account = params.account;
+    if (!candidatesSet.has(account)) {
+      candidatesSet.add(account);
+      candidates.enqueue(account);
+      }
+    });
+
+  ws.on('candidateStop', (params) => {
+    const account = params.account;
+    if (candidatesSet.has(account)) {
+      candidatesSet.delete(account);
+      }
+    });
+
+    while (true) {
+      const account = await candidates.dequeue();
+      candidatesSet.delete(account);
+      await newAccountOnLiquidatableFeed(account);
+    }
   }
-}
 
 function watchAccounts(
   mangoProgramId: PublicKey,
